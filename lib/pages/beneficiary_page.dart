@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled/pages/recipients_page.dart';
 import 'package:provider/provider.dart';
-import '../model/contact.dart';
 import '../model/contact_list.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class BeneficialPage extends StatefulWidget {
   const BeneficialPage({Key? key}) : super(key: key);
@@ -14,14 +13,22 @@ class BeneficialPage extends StatefulWidget {
 
 class _BeneficialPageState extends State<BeneficialPage> {
 
+  void checkConnectivity() async {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
+      var provider = Provider.of<ContactList>(context, listen: false);
+      var connectivityResult = await (Connectivity().checkConnectivity());
+      if (connectivityResult == ConnectivityResult.mobile
+          || connectivityResult == ConnectivityResult.wifi) {
+        provider.setFromAPI();
+      }else{
+        provider.setFromDB();
+      }
+    });
+  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      var provider = Provider.of<ContactList>(context, listen: false);
-      provider.setFromDB();
-    });
+    checkConnectivity();
   }
   @override
   Widget build(BuildContext context) {
@@ -47,12 +54,12 @@ class _BeneficialPageState extends State<BeneficialPage> {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: const [
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: Text("Recipients", style: TextStyle(color: Colors.grey, fontSize: 30, fontWeight: FontWeight.bold),),
             ),
-            ContactListView(),
+            ContactListView()
           ],
         ),
       ),
@@ -76,21 +83,22 @@ class ContactListView extends StatelessWidget {
   Widget build(BuildContext context) {
     var provider = context.watch<ContactList>();
     return ListView.builder(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: provider.contacts.length,
-        itemBuilder: (context, index) => ContactView(contact: provider.contacts[index],));
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemCount: provider.contacts.length,
+          itemBuilder: (context, index) => ContactView(index: index,));
   }
 }
 
 class ContactView extends StatelessWidget {
-  const ContactView({Key? key, required this.contact}) : super(key: key);
+  const ContactView({Key? key, required this.index}) : super(key: key);
 
-  final Contact contact;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     var provider = context.watch<ContactList>();
+    var contact = provider.contacts[index];
     return Dismissible(
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
@@ -106,7 +114,7 @@ class ContactView extends StatelessWidget {
             color: Colors.grey
           ),
         ),
-        title: Text(contact.namesurname, style: TextStyle(fontWeight: FontWeight.bold),),
+        title: Text(contact.namesurname, style: const TextStyle(fontWeight: FontWeight.bold),),
         subtitle: Text(contact.number),
         trailing: GestureDetector(
           onTap: (){},

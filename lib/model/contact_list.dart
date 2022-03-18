@@ -1,37 +1,51 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:untitled/service/hive.dart';
 import 'package:untitled/service/http.dart';
-
 import 'contact.dart';
+
+
 
 class ContactList with ChangeNotifier{
   List<Contact> contacts = [];
-
 
   void setFromDB(){
     var string = HiveService.load();
     if(string != ""){
       contacts = decode(string);
+      notifyListeners();
     }
-    notifyListeners();
   }
 
+  Future<void> setFromAPI() async {
+    var response = await HttpService.GET();
+    print("From set Api: $response");
+
+    HiveService.store(response!);
+    contacts = decode(response);
+
+    notifyListeners();
+  }
   void add(Contact contact){
     contacts.add(contact);
-    HiveService.store(encode(contacts));
+    _updateServices();
     notifyListeners();
   }
 
   void delete(Contact contact){
     if(contacts.contains(contact)){
       contacts.remove(contact);
-      HiveService.store(encode(contacts));
+      notifyListeners();
+      _updateServices();
     }
-    notifyListeners();
   }
 
+  void _updateServices(){
+    var encoded = encode(contacts);
+
+    HttpService.POST(encoded);
+    HiveService.store(encoded);
+  }
   static String encode(List<Contact> list){
     var string =  list.map((contact) => contact.toJSON()).toList();
     var d = jsonEncode(string);
@@ -42,10 +56,10 @@ class ContactList with ChangeNotifier{
   static List<Contact> decode(String json){
     List<Contact> list = [];
 
-    print(json);
     var decoded = jsonDecode(json);
-    
-    print(decoded.runtimeType);
+
+    print("From decode: $decoded");
+
     for(var contact in decoded){
       list.add(Contact.fromJSON(contact));
     }

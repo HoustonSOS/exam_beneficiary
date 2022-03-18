@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +74,7 @@ class _BodyState extends State<Body> {
                             gradient: LinearGradient(
                               begin: Alignment.bottomCenter,
                               end: Alignment.topCenter,
-                              stops: [
+                              stops: const [
                                 0.1,
                                 0.8
                               ],
@@ -90,8 +89,8 @@ class _BodyState extends State<Body> {
                       Container(
                         height: 30,
                         width: 30,
-                        child: Icon(Icons.camera_alt, color: Colors.white, size: 15,),
-                        decoration: BoxDecoration(
+                        child: const Icon(Icons.camera_alt, color: Colors.white, size: 15,),
+                        decoration: const  BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.grey,
                         ),
@@ -107,7 +106,7 @@ class _BodyState extends State<Body> {
             ],
           ),
           Padding(
-            padding: EdgeInsets.all(50),
+            padding: const EdgeInsets.all(50),
             child: GestureDetector(
               onTap: _onAdd,
               child: Container(
@@ -115,7 +114,7 @@ class _BodyState extends State<Body> {
                 width: MediaQuery.of(context).size.width * 0.8,
                 height: MediaQuery.of(context).size.height * 0.06,
                 child: const Text("Save", style: TextStyle(color: Colors.white, fontSize: 20),),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.all(Radius.circular(20.0))
                 ),

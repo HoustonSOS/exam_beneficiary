@@ -14,7 +14,7 @@ class HttpService{
     var response = await http.get(uri);
 
     if(response.statusCode == 200){
-      print("from get function: $response.body");
+      print("GET function: ${response.body}");
       return response.body;
     }else{
       print(response.statusCode);
@@ -25,7 +25,7 @@ class HttpService{
   static Future<http.Response?> POST(String contacts) async {
     var uri = Uri.https(API, PATH_GET);
 
-    print("From post function: $contacts");
+    print("POST function: $contacts");
 
     var response = await http.post(uri, body: contacts);
 
